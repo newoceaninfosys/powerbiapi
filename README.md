@@ -25,4 +25,4 @@ Prepare:
 Test:
  1. Go to https://nois-powerbiapi.azurewebsites.net
  2. Touch Red btn, to Clear AccessToken & RefreshToken
- 3. Touch any blue btn, login with test@lyminhquan.com / Yogu9877
+ 3. Touch any blue btn, login with test@lyminhquan.com / X3wVUbxx
