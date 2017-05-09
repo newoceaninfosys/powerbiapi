@@ -24,6 +24,6 @@ Prepare:
  5. Change UseSql in web.config = 0 to use memory local instead sql server
 
 Test:
- 1. Go to http://nois-powerbiapi.azurewebsites.net
+ 1. Go to https://nois-powerbiapi.azurewebsites.net
  2. Touch Red btn, to Clear AccessToken & RefreshToken
  3. Touch any blue btn, login with test@lyminhquan.com / Qwe!@#123
