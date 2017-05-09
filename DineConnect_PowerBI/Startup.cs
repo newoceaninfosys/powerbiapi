@@ -24,16 +24,17 @@ namespace DineConnect_PowerBI
 
             builder.RegisterApiControllers(typeof(WebApiApplication).Assembly);
 
-            if (false)
-            {
-                builder.RegisterType<CacheSettingService>()
-                    .As<ISettingService>().InstancePerDependency();
-            }
-            else
+            var useSql = ConfigurationManager.AppSettings.Get("UseSql");
+            if (useSql == "1")
             {
                 builder.RegisterType<SqlSettingService>()
                     .As<ISettingService>().InstancePerDependency();
                 CheckDatabase();
+            }
+            else
+            {
+                builder.RegisterType<CacheSettingService>()
+                    .As<ISettingService>().InstancePerDependency();
             }
 
             container = builder.Build();
