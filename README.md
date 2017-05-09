@@ -22,3 +22,8 @@ Prepare:
  3. RedirectUrl -> for test, this is http://localhost:your_port
  4. ConnectionString -> database to store access & refresh token
  5. Change UseSql in web.config = 0 to use memory local instead sql server
+
+Test:
+ 1. Go to http://nois-powerbiapi.azurewebsites.net
+ 2. Touch Red btn, to Clear AccessToken & RefreshToken
+ 3. Touch any blue btn, login with test@lyminhquan.com / Qwe!@#123
