@@ -26,3 +26,7 @@ Test:
  1. Go to https://nois-powerbiapi.azurewebsites.net
  2. Touch Red btn, to Clear AccessToken & RefreshToken
  3. Touch any blue btn, login with test@lyminhquan.com / X3wVUbxx
+
+Check:
+ 1. Login to http://app.powerbi.com/ with test@lyminhquan.com / X3wVUbxx
+ 2. Check in My Workspaces -> DATASETS
