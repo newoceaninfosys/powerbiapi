@@ -25,7 +25,7 @@ namespace DineConnect_PowerBI.Controllers
         private readonly string _powerBIApi = ConfigurationManager.AppSettings["PowerBiApiUrl"].ToString();
         private readonly string _powerBiDataset = ConfigurationManager.AppSettings["PowerBiDatasetUrl"].ToString();
         private readonly string _authUrl = ConfigurationManager.AppSettings["AuthUrl"].ToString();
-        private readonly string _redirectUrl = ConfigurationManager.AppSettings["RedirectUrl"].ToString();
+        //private readonly string _redirectUrl = ConfigurationManager.AppSettings["RedirectUrl"].ToString();
 
         private readonly ISettingService _settingService;
 
@@ -105,6 +105,13 @@ namespace DineConnect_PowerBI.Controllers
             var response = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(iRestResponse.Content);
             return await Task.FromResult(response);
         }
+
+        private string GetCurrentUrl()
+        {
+            return Request.RequestUri.Scheme + "://" + Request.RequestUri.Host +
+                   (Request.RequestUri.Port == 80 ? "" : ":" + Request.RequestUri.Port);
+        }
+
         #endregion
 
         #region methods
@@ -116,7 +123,7 @@ namespace DineConnect_PowerBI.Controllers
                       "?response_type=code" +
                       "&client_id=" + _clientId +
                       "&resource=" + _powerBIApi +
-                      "&redirect_uri=" + _redirectUrl;
+                      "&redirect_uri=" + GetCurrentUrl();
             return Ok(url);
         }
 
@@ -181,7 +188,7 @@ namespace DineConnect_PowerBI.Controllers
                     "grant_type=authorization_code" +
                     "&client_id=" + HttpUtility.UrlEncode(_clientId) +
                     "&code=" + code +
-                    "&redirect_uri=" + HttpUtility.UrlEncode(_redirectUrl) +
+                    "&redirect_uri=" + HttpUtility.UrlEncode(GetCurrentUrl()) +
                     "&resource=https://analysis.windows.net/powerbi/api" +
                     "&client_secret=" + HttpUtility.UrlEncode(_clientSecrect);
 
