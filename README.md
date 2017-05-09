@@ -21,3 +21,4 @@ Prepare:
  2. ClientID, ClientSecret -> follow this: https://powerbi.microsoft.com/en-us/documentation/powerbi-developer-register-a-client-app/
  3. RedirectUrl -> for test, this is http://localhost:your_port
  4. ConnectionString -> database to store access & refresh token
+ 5. Change UseSql in web.config = 0 to use memory local instead sql server
