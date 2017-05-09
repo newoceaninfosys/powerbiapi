@@ -1,0 +1,262 @@
+﻿@*<div class="jumbotron">
+        <h1>ASP.NET</h1>
+        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
+        <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Getting started</h2>
+            <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
+            a broad range of clients, including browsers and mobile devices. ASP.NET Web API
+            is an ideal platform for building RESTful applications on the .NET Framework.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Get more libraries</h2>
+            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Web Hosting</h2>
+            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+        </div>
+    </div>*@
+
+@using DineConnect_PowerBI.Helpers
+
+@*@section Styles
+    {
+        <link href="~/libs/fancybox/source/jquery.fancybox.css" rel="stylesheet">
+        <link href="~/libs/carousel-owl-carousel/owl-carousel/owl.carousel@(CultureHelper.IsRtl ? "-rtl" : "").css" rel="stylesheet">
+        <style>
+            .fw {
+                width: 100%;
+            }
+        </style>
+    }
+    @section Scripts
+    {
+        <script src="~/libs/fancybox/source/jquery.fancybox.pack.js" type="text/javascript"></script><!-- pop up -->
+        <script src="~/libs/carousel-owl-carousel/owl-carousel/owl.carousel@(CultureHelper.IsRtl ? "-rtl" : "").js" type="text/javascript"></script><!-- slider for products -->
+        <script type="text/javascript">
+            //$(function () {
+            //    Layout.initOWL();
+            //});
+        </script>
+    }*@
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    @Styles.Render("~/Content/css")
+</head>
+<body>
+
+
+    <script>
+
+        angular.module('appLayout')
+            .controller('CreateDatasetModalController', ['$uibModalInstance', 'options', '$scope', '$sce', function ($uibModalInstance, options, $scope, $sce) {
+                function ok() {
+                    $uibModalInstance.close();
+                }
+                function cancel() {
+                    $uibModalInstance.dismiss();
+                }
+                $scope.options = options;
+                $scope.options.message = $sce.trustAsHtml($scope.options.message);
+                $scope.ok = ok;
+                $scope.cancel = cancel;
+            }])
+            .controller('HomeController', ['$scope', '$http', '$uibModal', function ($scope, $http, $uibModal) {
+                function showModal(title, msg, obj) {
+                    return $uibModal.open({
+                        controller: 'CreateDatasetModalController',
+                        size: 'md',
+                        templateUrl: '/public/templates/CreateDatasetModal.html',
+                        resolve: {
+                            options: {
+                                title: title,
+                                message: msg,
+                                obj: obj
+                            }
+                        }
+                    }).result;
+                }
+
+                function getTokenFromCode(code) {
+                    $http.get('/api/nois/gettoken?code=' + code).then(function (resp) {
+                        window.location.href = window.location.origin;
+                    },
+                        function (err) {
+                            showModal('Error', err.data.error.message);
+                        });
+                }
+                function signinAsPowerBi() {
+                    $http.get('/api/nois/signin').then(function (resp) {
+                        window.location.href = resp.data;
+                    }, function (err) {
+                        showModal('Error', err.data.error.message);
+                    });
+                }
+                function parseCode() {
+
+                    var uri = window.location.href;
+                    var queryString = {};
+                    uri.replace(
+                        new RegExp("([^?=&]+)(=([^&]*))?", "g"),
+                        function ($0, $1, $2, $3) { queryString[$1] = $3; }
+                    );
+                    return queryString['code'];
+                }
+                function init() {
+                    var currentCode = parseCode();
+                    if (currentCode) {
+                        getTokenFromCode(currentCode);
+                    }
+                }
+                $scope.getListDataset = function () {
+                    $http.get('/api/nois/datasets', {
+                        //token: $scope.userToken
+                    }).then(function (resp) {
+                        switch (resp.data.Status) {
+                            case 1:
+                                showModal('Sucess', resp.data.Message);
+                                break;
+                            case 0:
+                                showModal('Error', resp.data.Message);
+                                break;
+
+                            case -1:
+                                // Un auth
+                                // Call ajax here
+                                signinAsPowerBi();
+                                break;
+                        }
+                    }, function (err) {
+                    })
+                    //$uibModal.open({
+                    //    controller: 'Modal1',
+                    //    size: 'md',
+                    //    templateUrl: '/public/templates/modal1.html'
+                    //})
+                }
+
+                $scope.createDataset = function () {
+                    $http.get('/api/nois/createdataset', {
+                        //"token": $scope.userToken,
+                    }).then(function (resp) {
+                        switch (resp.data.Status) {
+                            case 1:
+                                showModal('Success', resp.data.Message);
+                                break;
+                            case 0:
+                                showModal('Error', resp.data.Message);
+                                break;
+
+                            case -1:
+                                // Un auth
+                                // Call ajax here
+                                signinAsPowerBi();
+                                break;
+                        }
+                    }, function (err) {
+                    })
+
+                }
+                $scope.populateData = function () {
+                    $http.get('/api/nois/populatedata', {
+                        //"token": $scope.userToken,
+                    }).then(function (resp) {
+                        switch (resp.data.Status) {
+                            case 1:
+                                showModal('Success', resp.data.Message);
+                                break;
+                            case 0:
+                                showModal('Error', resp.data.Message);
+                                break;
+
+                            case -1:
+                                // Un auth
+                                // Call ajax here
+                                signinAsPowerBi();
+                                break;
+                        }
+                    }, function (err) {
+                    })
+
+                }
+                $scope.pushRows = function () {
+                    $http.get('/api/nois/pushrow', {
+                        //"datasetId": "string",
+                        //"tableName": "string",
+                        //"token": "string",
+                        //"rows": [
+                        //    {}
+                        //]
+                    }).then(function (resp) {
+                        switch (resp.data.Status) {
+                            case 1:
+                                showModal('Success', resp.data.Message);
+                                break;
+                            case 0:
+                                showModal('Error', resp.data.Message);
+                                break;
+
+                            case -1:
+                                // Un auth
+                                // Call ajax here
+                                signinAsPowerBi();
+                                break;
+                        }
+                    }, function (err) {
+                    })
+                }
+                //$scope.clearTable = function () {
+                //    $http.post('/api/services/app/noisService/clearTable', {
+                //        "token": "string",
+                //        "datasetId": "string",
+                //        "tableName": "string"
+                //    }).then(function (resp) {
+                //        switch (resp.data.Status) {
+                //            case 1:
+                //                showModal('Success', resp.data.Message);
+                //                break;
+                //            case 0:
+                //                showModal('Error', resp.data.Message);
+                //                break;
+
+                //            case -1:
+                //                // Un auth
+                //                // Call ajax here
+                //                signinAsPowerBi();
+                //                break;
+                //        }
+                //    }, function (err) {
+                //        debugger;
+                //    })
+                //}
+                init();
+            }])
+
+        //do work
+    </script>
+
+    <div class="row margin-bottom-30" ng-controller="HomeController">
+        <div class="col-md-3 text-center">
+            <a class="btn btn-info fw" ng-click="getListDataset()" href="javascript:void(0)">Get List Dataset</a>
+        </div>
+        <div class="col-md-3 text-center">
+            <a class="btn btn-info fw" ng-click="createDataset()" href="javascript:void(0)">Create Dataset</a>
+        </div>
+        <div class="col-md-3 text-center">
+            <a class="btn btn-info fw" ng-click="pushRows()" href="javascript:void(0)">Push Rows</a>
+        </div>
+        <div class="col-md-3 text-center">
+            <a class="btn btn-info fw" ng-click="populateData()" href="javascript:void(0)">Populate Data</a>
+        </div>
+    </div>
+</body>
+</html>

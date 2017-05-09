@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js"></script>
+</head>
+<body>
+    <script>
+        var module = angular.module('appLayout', ['ui.bootstrap']);
+        module.controller('CreateDatasetModalController', ['$uibModalInstance', 'options', '$scope', '$sce', function ($uibModalInstance, options, $scope, $sce) {
+            function ok() {
+                $uibModalInstance.close();
+            }
+            function cancel() {
+                $uibModalInstance.dismiss();
+            }
+            $scope.options = options;
+            $scope.options.message = $sce.trustAsHtml($scope.options.message);
+            $scope.ok = ok;
+            $scope.cancel = cancel;
+        }])
+            .controller('AppController', ['$scope', '$http', '$uibModal', function ($scope, $http, $uibModal) {
+
+                function showModal(title, msg, obj) {
+                    return $uibModal.open({
+                        controller: 'CreateDatasetModalController',
+                        size: 'md',
+                        templateUrl: '/public/templates/CreateDatasetModal.html',
+                        resolve: {
+                            options: {
+                                title: title,
+                                message: msg,
+                                obj: obj
+                            }
+                        }
+                    }).result;
+                }
+
+                $scope.resetData = function () {
+                    $http.get('/api/nois/resetdata').then(function (resp) {
+                        showModal('Success', resp.data.Message);
+                    },
+                        function (err) {
+                            showModal('Error', err.data.error.message);
+                        })
+                }
+
+            }])
+
+        angular.element(function () {
+            angular.bootstrap(document, ['appLayout']);
+        });
+    </script>
+    <div class="navbar navbar-inverse navbar-fixed-top" ng-controller="AppController">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("API", "Index", "Help", new { area = "" }, null)</li>
+                    @*<li><a href="">API</a></li>*@
+                    <li><a class="btn btn-info fw" style="margin:10px; padding:3%; text-align:center;color:white; font-weight:600; background-color:red" ng-click="resetData()" href="javascript:void(0)">Reset Data</a></li>
+                </ul>
+            </div>
+            <div>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
